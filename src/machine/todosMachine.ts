@@ -8,19 +8,14 @@ interface todo{
     isActive:boolean,
 }
 
-interface todoListItem  extends todo {
+export interface todoListItem  extends todo {
     id:string,
 }
 
-interface TodoContext{
+export interface TodoContext{
     todosList: todoListItem[]
 }
 
-// type TodosTypeState =
-//   | {
-//       value: 'idle';
-//       context: TodoContext;
-//     }
 
 
 function createTodo(title:string):todoListItem{

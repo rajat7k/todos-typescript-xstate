@@ -1,46 +1,41 @@
-import { useActor } from '@xstate/react';
-import React, { useContext } from 'react'
+
+import { inject, observer } from 'mobx-react';
+import React from 'react'
 import { localStorageKeyName } from '../../constants/localStorageKeyNames';
-import HomeContext from '../../context/HomeRouteContext/homeRouteContext';
+import TodosMobxStore from '../../store/todosStore';
 import { setItemInLocalStorage } from '../../utils/getAndSetLocalStorage';
 import { HeadingBoldSpan, HomePageBtn, HomePageSubHeading, TodoListContainer ,TodoList,TodoItemBox,TodoCheckBox,TodoContextBox ,TodoItemDeleteIcon} from '../HomeStyleComponents'
 
-const TodoListShowComponent:React.FC=()=>{
 
-    const {todosMachine}=useContext(HomeContext)
-    const [state,send]=useActor(todosMachine)
-    
-    const todosList=state.context.todosList;
+export interface todoStorePropInterface{
+    todosStore?:TodosMobxStore
+}
 
-    function handleCheckBoxInput(event:React.ChangeEvent<HTMLInputElement>) {
-        send({
-            type:'CLICK_ON_CHECKED_BOX',
-            id:event.target.id,
-            isChecked:event.target.checked
-        })
-    }
+const TodoListShowComponent:React.FC<todoStorePropInterface>=inject('todosStore')(observer(({todosStore})=>{
+
+
+
+    console.log(todosStore)
 
     function handleDeleteBtnPress(id:string) {
-        send({
-            type:'CLICK_ON_DELETE_TODO',
-            id,
-        })
+
+        todosStore?.deleteTodoById(id)
     }
 
     function handleClickOnSaveBtn(){
-        setItemInLocalStorage(localStorageKeyName.todosList,JSON.stringify(todosList));
+        setItemInLocalStorage(localStorageKeyName.todosList,JSON.stringify(todosStore?.todos));
     }
 
     function showFilterTodoList() {
         return <TodoList>
                 {
-                    todosList.map((item)=>{
+                    todosStore?.todos.map((item)=>{
                         return <React.Fragment key={item.id} >
                             <li>  
                                 <TodoItemBox>
-                                    <TodoCheckBox id={item.id} checked={item.isActive ? false : true} onChange={handleCheckBoxInput} className='check-Box' type="checkbox" />
+                                    <TodoCheckBox id={item.id} checked={item.isActive} onChange={item.toggleIsActive} className='check-Box' type="checkbox" />
                                     <TodoContextBox>
-                                    <p style={{ textDecoration: item.isActive ? "none" : "line-through" }} > {item.title} </p>
+                                    <p style={{ textDecoration: !item.isActive ? "none" : "line-through" }} > {item.title} </p>
                                     <TodoItemDeleteIcon className="far fa-trash-alt delete-icon" onClick={()=>handleDeleteBtnPress(item.id)} ></TodoItemDeleteIcon>
                                     </TodoContextBox>
                                 </TodoItemBox>    
@@ -63,6 +58,6 @@ const TodoListShowComponent:React.FC=()=>{
 
         </TodoListContainer>
     )
-}
+}))
 
 export default TodoListShowComponent

@@ -1,21 +1,15 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { HeadingBoldSpan, HomePageBtn, HomePageSubHeading, TodoAddContainer, TodoInputContainer } from '../HomeStyleComponents'
-import HomeContext from '../../context/HomeRouteContext/homeRouteContext';
-import { useActor } from '@xstate/react';
 
-const TodoAddComponent:React.FC=()=>{
+import { inject, observer } from 'mobx-react';
+import { todoStorePropInterface } from '../TodoListShowComponent';
+
+const TodoAddComponent:React.FC<todoStorePropInterface>=inject('todosStore')(observer(({todosStore})=>{
 
     const [todoInputValue, setTodoInputValue] = useState('');
-    const {todosMachine}=useContext(HomeContext)
 
-    const [,send]=useActor(todosMachine)
-
-
-    function handleClickOnAddBtn(){
-        send({
-            type:'ADD_TODO',
-            title:todoInputValue,
-        })
+    function handleClickOnAddBtn(){              
+        todosStore?.addTodo(todoInputValue)
         setTodoInputValue('');
     }
 
@@ -25,7 +19,6 @@ const TodoAddComponent:React.FC=()=>{
     }
     
     function onInputKeyPress(event:any){
-        console.log(typeof event.key)
         if(event.key==='Enter' && event.target.value!==''){
             handleClickOnAddBtn()
         }
@@ -38,6 +31,8 @@ const TodoAddComponent:React.FC=()=>{
             <HomePageBtn onClick={handleClickOnAddBtn} disabled={todoInputValue === '' ? true : false}  >Add</HomePageBtn>
         </TodoAddContainer>
     )
-}
+}))
+
+
 
 export default TodoAddComponent

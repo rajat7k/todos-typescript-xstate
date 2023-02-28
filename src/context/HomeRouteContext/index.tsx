@@ -4,7 +4,7 @@ import { TodosMachine } from '../../machine/todosMachine'
 import HomeContext from './homeRouteContext'
 
 interface HomeRouteContextPropsInterFace{
-    children?:React.ReactNode|React.ReactNode[]
+    children:React.ReactNode|React.ReactNode[]
 }
 
 
